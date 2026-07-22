@@ -11,7 +11,7 @@
         /* Menu & Input Nama */
         .menu-title { color: #2c3e50; margin-bottom: 5px; }
         .menu-sub { color: #7f8c8d; font-size: 14px; margin-bottom: 15px; }
-        input[type="text"] { width: 85%; padding: 10px; font-size: 15px; border: 2px solid #ccc; border-radius: 6px; margin-bottom: 15px; text-align: center; }
+        input[type="text"], select { width: 85%; padding: 10px; font-size: 14px; border: 2px solid #ccc; border-radius: 6px; margin-bottom: 10px; text-align: center; box-sizing: border-box; }
         .btn-menu { display: block; width: 100%; padding: 12px; margin: 8px 0; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-det { background: #27ae60; } .btn-det:hover { background: #219150; }
         .btn-trace { background: #8e44ad; } .btn-trace:hover { background: #71368a; }
@@ -43,9 +43,24 @@
     <!-- 1. HALAMAN MENU & INPUT NAMA -->
     <div id="screen_menu">
         <h2 class="menu-title">MATRIX BLITZ ARENA</h2>
-        <p class="menu-sub">Masukkan Nama & Pilih Mode Game:</p>
+        <p class="menu-sub">Lengkapi Data Identitas & Pilih Mode Game:</p>
         
         <input type="text" id="input_nama" placeholder="Ketik Nama Anda..." value="Peserta Workshop">
+
+        <!-- TAMBAHAN ELEMEN DROPDOWN TINGKAT & INPUT INSTANSI -->
+        <select id="select_tingkat">
+            <option value="Guru / Pendidik">Guru / Pendidik</option>
+            <option value="Mahasiswa / Dosen">Mahasiswa / Dosen</option>
+            <option value="7 SMP">7 SMP</option>
+            <option value="8 SMP">8 SMP</option>
+            <option value="9 SMP">9 SMP</option>
+            <option value="10 SMA">10 SMA</option>
+            <option value="11 SMA">11 SMA</option>
+            <option value="12 SMA">12 SMA</option>
+            <option value="Umum">Umum</option>
+        </select>
+
+        <input type="text" id="input_instansi" placeholder="Nama Sekolah / Instansi (misal: FMIPA UNM)..." value="FMIPA UNM">
 
         <button class="btn-menu btn-det" onclick="pilihMode('DETERMINAN')">1. Determinan Matriks 2×2</button>
         <button class="btn-menu btn-trace" onclick="pilihMode('TRACE')">2. Trace Matriks (a + d)</button>
@@ -87,6 +102,7 @@
         <div class="sertifikat-box">
             <div>Diberikan Kepada:</div>
             <div id="res_nama" class="nama-pemain">Nama Pemain</div>
+            <div id="res_sub" style="font-size: 12px; color: #7f8c8d; margin-top: 2px;">Tingkat | Instansi</div>
             <div style="margin-top: 5px;">Total Skor: <b id="res_skor">0</b> PTS</div>
             <div id="res_gelar" class="gelar-badge">Gelar: Matrix Master</div>
         </div>
@@ -100,8 +116,14 @@
 </div>
 
 <script>
+    // URL GOOGLE APPS SCRIPT KAK ALIF
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaxD_dz5Nyou5vVinpfofAcwyt6oGEBsR80Exi2K02UT5_Ng9xUJ1KnavbDWnFKjfE8Q/exec";
+
     let namaPemain = "";
+    let tingkatPemain = "";
+    let instansiPemain = "";
     let modeAktif = "";
+    let gelarPemain = "";
     let skor = 0, nomorSoal = 1, waktu = 15, timerInterval;
     let a, b, c, d, jawabanBenar, langkahPembahasan = "";
     let isGameOver = false; // Flag Pengunci State Game Over
@@ -113,7 +135,12 @@
 
     function pilihMode(mode) {
         let inputNama = document.getElementById("input_nama").value.trim();
+        let inputInstansi = document.getElementById("input_instansi").value.trim();
+        
         namaPemain = inputNama !== "" ? inputNama : "Pemain Anonim";
+        tingkatPemain = document.getElementById("select_tingkat").value;
+        instansiPemain = inputInstansi !== "" ? inputInstansi : "Umum";
+
         modeAktif = mode;
         skor = 0;
         nomorSoal = 1;
@@ -234,6 +261,23 @@
         }
     }
 
+    // FUNGSI PENGIRIM DATA KE SPREADSHEET KAK ALIF
+    function kirimDataKeSpreadsheet() {
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                nama: namaPemain,
+                tingkat: tingkatPemain,
+                instansi: instansiPemain,
+                gameMode: "MBA: " + modeAktif,
+                skor: skor,
+                gelar: gelarPemain
+            })
+        }).catch(err => console.log("Gagal kirim data ke Spreadsheet:", err));
+    }
+
     function tampilkanGameOver() {
         isGameOver = true;
         clearInterval(timerInterval);
@@ -244,12 +288,13 @@
 
         // Tampilkan Identitas & Gelar
         document.getElementById("res_nama").innerText = namaPemain;
+        document.getElementById("res_sub").innerText = `${tingkatPemain} | ${instansiPemain}`;
         document.getElementById("res_skor").innerText = skor;
 
-        let gelar = "🥉 Matrix Novice";
-        if (skor === 300) gelar = "🏆 Matrix Master (Sempurna!)";
-        else if (skor >= 100) gelar = "🥈 Matrix Warrior";
-        document.getElementById("res_gelar").innerText = "Gelar: " + gelar;
+        gelarPemain = "🥉 Matrix Novice";
+        if (skor === 300) gelarPemain = "🏆 Matrix Master (Sempurna!)";
+        else if (skor >= 100) gelarPemain = "🥈 Matrix Warrior";
+        document.getElementById("res_gelar").innerText = "Gelar: " + gelarPemain;
 
         // Render Pembahasan
         let htmlPembahasan = "";
@@ -267,6 +312,9 @@
             `;
         });
         document.getElementById("pembahasan_list").innerHTML = htmlPembahasan;
+
+        // EKSEKUSI PENGIRIMAN DATA KE GOOGLE SHEET
+        kirimDataKeSpreadsheet();
     }
 </script>
 </body>
