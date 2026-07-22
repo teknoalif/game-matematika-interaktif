@@ -1,33 +1,55 @@
-/* =========================================================
-   GOOGLE APPS SCRIPT BACKEND (DISIMPAM DI GOOGLE SHEETS)
-   Menu: Extensions -> Apps Script -> Paste Kode Ini -> Deploy
-   ========================================================= */
-
+// Backend Google Apps Script (doPost & doGet)
 function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var data = JSON.parse(e.postData.contents);
-  
-  // 1. Mencatat 7 Kolom Data Secara Otomatis dari Game Web
-  sheet.appendRow([
-    new Date(),          // Kolom A: Timestamp / Waktu Pengerjaan
-    data.nama,           // Kolom B: Nama Pemain / Agen
-    data.tingkat,        // Kolom C: Tingkat / Peran (Guru, SMP, SMA, dll)
-    data.instansi,       // Kolom D: Nama Sekolah / Instansi
-    data.gameMode,       // Kolom E: Nama Game / Mode yang Dimainkan
-    data.skor,           // Kolom F: Total Skor Akhir
-    data.gelar          // Kolom G: Gelar Digital yang Diraih
-  ]);
-  
-  // 2. Format Otomatis Baris Terakhir (Middle Vertical Align & Wrap Text)
-  var lastRow = sheet.getLastRow();
-  var range = sheet.getRange(lastRow, 1, 1, 7);
-  range.setWrap(true);
-  range.setVerticalAlignment("middle");
-  
-  // 3. Auto-fit Ukuran Lebar Kolom A s.d G
-  for (var col = 1; col <= 7; col++) {
-    sheet.autoResizeColumn(col);
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var contents = JSON.parse(e.postData.contents);
+    var timestamp = Utilities.formatDate(new Date(), "Asia/Makassar", "yyyy-MM-dd HH:mm:ss");
+    
+    sheet.appendRow([
+      timestamp,
+      contents.nama || "Pemain Anonim",
+      contents.tingkat || "Umum",
+      contents.instansi || "Umum",
+      contents.gameMode || "Game",
+      contents.skor || 0,
+      contents.gelar || "-"
+    ]);
+
+    var lastRow = sheet.getLastRow();
+    sheet.getRange(lastRow, 1, 1, 7).setWrap(true).setVerticalAlignment("middle");
+    for (var col = 1; col <= 7; col++) { sheet.autoResizeColumn(col); }
+
+    return ContentService.createTextOutput(JSON.stringify({ "status": "success" })).setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({ "status": "error", "message": err.toString() })).setMimeType(ContentService.MimeType.JSON);
   }
-  
-  return ContentService.createTextOutput("Sukses").setMimeType(ContentService.MimeType.TEXT);
+}
+
+function doGet(e) {
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var rows = sheet.getDataRange().getValues();
+    var data = [];
+    
+    for (var i = 1; i < rows.length; i++) {
+      if (rows[i][1] !== "") {
+        var timeFormatted = rows[i][0];
+        if (timeFormatted instanceof Date) {
+          timeFormatted = Utilities.formatDate(timeFormatted, "Asia/Makassar", "yyyy-MM-dd HH:mm:ss");
+        }
+        data.push({
+          timestamp: timeFormatted,
+          nama: rows[i][1],
+          tingkat: rows[i][2],
+          instansi: rows[i][3],
+          gameMode: rows[i][4],
+          skor: rows[i][5],
+          gelar: rows[i][6]
+        });
+      }
+    }
+    return ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON);
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify([])).setMimeType(ContentService.MimeType.JSON);
+  }
 }
