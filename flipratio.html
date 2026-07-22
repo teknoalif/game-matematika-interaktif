@@ -25,7 +25,7 @@
         input[type="number"] { padding: 8px; font-size: 16px; text-align: center; border-radius: 6px; border: 1px solid #ccc; }
         
         /* Buttons */
-        .btn-action { width: 100%; padding: 12px; background: #d35400; color: white; border: none; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-action { width: 100%; padding: 12px; background: #d35400; color: white; border: none; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; box-sizing: border-box; }
         .btn-action:hover { background: #a04000; }
         .btn-back { background: #7f8c8d; margin-top: 10px; padding: 8px; font-size: 12px; width: 50%; }
 
@@ -102,7 +102,11 @@
         <div id="pembahasan_list" class="pembahasan-box"></div>
 
         <br>
-        <button class="btn-action" onclick="kembaliKeMenu()">Main Lagi &larr;</button>
+        <!-- TOMBOL NAVIGASI SETELAH SELESAI -->
+        <div style="display: flex; gap: 8px;">
+            <button class="btn-action" style="flex: 1;" onclick="kembaliKeMenu()">🔄 Main Lagi</button>
+            <a href="index.html" class="btn-action" style="flex: 1; background: #34495e; text-decoration: none; text-align: center; line-height: 20px;">🏠 Portal Utama</a>
+        </div>
     </div>
 </div>
 
