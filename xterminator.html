@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>X-TERMINATOR: CoC SPLTV Challenge</title>
+    <title>X-TERMINATOR: CoC SPLTV Challenge (4 Babak)</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a252f; color: #ecf0f1; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
         .game-card { background: #2c3e50; padding: 25px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.4); width: 450px; text-align: center; border: 2px solid #e74c3c; }
@@ -41,7 +41,7 @@
     <!-- 1. HALAMAN MENU & INPUT NAMA AGEN -->
     <div id="screen_menu">
         <div class="coc-title">⚔️ X-TERMINATOR: CoC ARENA ⚔️</div>
-        <p class="coc-sub">Misi Intelijen Membongkar Kode Rahasia SPLTV (x, y, z)</p>
+        <p class="coc-sub">Misi Intelijen 4 Babak Membongkar Kode Rahasia SPLTV (x, y, z)</p>
         
         <input type="text" id="input_nama" placeholder="Ketik Nama Agen Anda..." value="Agen Alif">
 
@@ -60,13 +60,13 @@
 
         <input type="text" id="input_instansi" placeholder="Nama Instansi / Sekolah..." value="FMIPA UNM">
 
-        <button class="btn-action" onclick="mulaiMisi()" style="margin-top: 10px;">MULAI MISI PETUALANGAN &rarr;</button>
+        <button class="btn-action" onclick="mulaiMisi()" style="margin-top: 10px;">MULAI 4 BABAK MISI &rarr;</button>
     </div>
 
     <!-- 2. HALAMAN ARENA MISI GAME -->
     <div id="screen_game" style="display: none;">
         <div class="stats-bar">
-            <div>BABAK: <span id="babak_text">1/3</span></div>
+            <div>BABAK: <span id="babak_text">1/4</span></div>
             <div>SKOR: <span id="skor">0</span></div>
             <div>WAKTU: <span id="waktu">30</span>s</div>
         </div>
@@ -96,15 +96,15 @@
             <div>Agen Khusus:</div>
             <div id="res_nama" class="agent-name">Nama Agen</div>
             <div id="res_sub" style="font-size: 12px; color: #bdc3c7; margin-top: 2px;">Tingkat | Instansi</div>
-            <div style="margin-top: 8px;">Skor Akhir: <b id="res_skor" style="color: #f1c40f;">0</b> PTS</div>
+            <div style="margin-top: 8px;">Skor Akhir: <b id="res_skor" style="color: #f1c40f;">0</b> / 400 PTS</div>
             <div id="res_gelar" class="gelar-badge">Gelar: Ultimate X-Terminator</div>
         </div>
 
-        <h4 style="text-align: left; margin-bottom: 8px; color: #f1c40f;">📋 Laporan Intelijen (Pembahasan):</h4>
+        <h4 style="text-align: left; margin-bottom: 8px; color: #f1c40f;">📋 Laporan Intelijen (Pembahasan 4 Babak):</h4>
         <div id="pembahasan_list" class="pembahasan-box"></div>
 
         <br>
-        <!-- TOMBOL NAVIGASI SETELAH SELESAI -->
+        <!-- TOMBOL NAVIGASI GANDA -->
         <div style="display: flex; gap: 8px;">
             <button class="btn-action" style="flex: 1;" onclick="kembaliKeMenu()">🔄 Misi Baru</button>
             <a href="index.html" class="btn-action" style="flex: 1; background: #34495e; text-decoration: none; text-align: center; line-height: 20px;">🏠 Portal Utama</a>
@@ -113,14 +113,13 @@
 </div>
 
 <script>
-    // URL APPS SCRIPT KAK ALIF
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaxD_dz5Nyou5vVinpfofAcwyt6oGEBsR80Exi2K02UT5_Ng9xUJ1KnavbDWnFKjfE8Q/exec";
 
     let namaAgen = "";
     let tingkatAgen = "";
     let instansiAgen = "";
     let gelarAgen = "";
-    let babak = 1; // 1: Eliminasi X, 2: Cari Z, 3: Cari X & Y
+    let babak = 1; // 1: Eliminasi X, 2: Cari Z, 3: Cari Y, 4: Cari X
     let skor = 0, waktu = 30, timerInterval;
     let x_true, y_true, z_true;
     let a1, b1, c1, d1, a2, b2, c2, d2;
@@ -156,7 +155,6 @@
         document.getElementById("screen_menu").style.display = "block";
     }
 
-    // Generator Kunci Jawaban Bulat Presisi
     function generateSystemSPLTV() {
         x_true = randomInt(1, 4);
         y_true = randomInt(1, 4);
@@ -174,7 +172,7 @@
         clearInterval(timerInterval);
         waktu = 30;
         document.getElementById("waktu").innerText = waktu;
-        document.getElementById("babak_text").innerText = babak + "/3";
+        document.getElementById("babak_text").innerText = babak + "/4";
         document.getElementById("pesan_status").innerText = "";
 
         let eqBox = document.getElementById("equation_display");
@@ -197,22 +195,27 @@
             eqBox.innerHTML = `
                 Persamaan Hasil Eliminasi X:<br>
                 <b>(${newB})y + (${newC})z = ${newD}</b><br>
-                <small style="color:#bdc3c7;">(Petunjuk: Jika y = ${y_true}, berapakah nilai z?)</small>
+                <small style="color:#bdc3c7;">(Petunjuk: Masukkan nilai y = ${y_true} yang sudah ditemukan)</small>
             `;
-            inputCont.innerHTML = `Masukkan Nilai <b>z</b>: <input type="number" id="input_z" style="width:70px;" autofocus>`;
+            inputCont.innerHTML = `Masukkan Nilai <b>z</b>: <input type="number" id="input_z" style="width:80px;" autofocus>`;
 
         } else if (babak === 3) {
-            document.getElementById("mission_badge").innerText = "BABAK 3: FINAL CODE (X & Y)";
+            document.getElementById("mission_badge").innerText = "BABAK 3: BONGKAR KODE Y";
             eqBox.innerHTML = `
-                Sistem Teridentifikasi:<br>
+                Substitusi Nilai Teridentifikasi:<br>
                 Nilai <b>z = ${z_true}</b><br>
                 P1: (${a1})x + (${b1})y + (${c1})(${z_true}) = ${d1}
             `;
-            inputCont.innerHTML = `
-                Tebak Kode Akhir:<br>
-                Nilai <b>x</b>: <input type="number" id="input_x" style="width:60px; margin-right:10px;" autofocus>
-                Nilai <b>y</b>: <input type="number" id="input_y" style="width:60px;">
+            inputCont.innerHTML = `Masukkan Nilai <b>y</b>: <input type="number" id="input_y" style="width:80px;" autofocus>`;
+
+        } else if (babak === 4) {
+            document.getElementById("mission_badge").innerText = "BABAK 4: FINAL CODE (X)";
+            eqBox.innerHTML = `
+                Substitusi Final Brankas:<br>
+                Nilai <b>y = ${y_true}</b> &amp; <b>z = ${z_true}</b><br>
+                P1: (${a1})x + (${b1})(${y_true}) + (${c1})(${z_true}) = ${d1}
             `;
+            inputCont.innerHTML = `Masukkan Kode Akhir <b>x</b>: <input type="number" id="input_x" style="width:80px;" autofocus>`;
         }
 
         timerInterval = setInterval(jalankanTimer, 1000);
@@ -239,7 +242,7 @@
             let k2 = parseInt(document.getElementById("k2").value);
             if ((a1 * k1 === a2 * k2) && k1 > 0 && k2 > 0) {
                 isSuccess = true;
-                ket = `Pengali k1=${k1}, k2=${k2} Tepat! Koefisien x tereliminasi menjadi ${a1*k1}.`;
+                ket = `Pengali k1=${k1}, k2=${k2} Tepat!`;
             } else {
                 ket = `Pengali Gagal. ${a1}&times;${k1} &ne; ${a2}&times;${k2}.`;
             }
@@ -252,13 +255,20 @@
                 ket = `Nilai z Salah. Jawaban Benar z = ${z_true}.`;
             }
         } else if (babak === 3) {
-            let valX = parseInt(document.getElementById("input_x").value);
             let valY = parseInt(document.getElementById("input_y").value);
-            if (valX === x_true && valY === y_true) {
+            if (valY === y_true) {
                 isSuccess = true;
-                ket = `Kode Akhir x=${x_true} & y=${y_true} BENAR SPESIFIK!`;
+                ket = `Nilai y = ${y_true} BENAR!`;
             } else {
-                ket = `Kode Gagal. Nilai Benar x=${x_true}, y=${y_true}.`;
+                ket = `Nilai y Salah. Jawaban Benar y = ${y_true}.`;
+            }
+        } else if (babak === 4) {
+            let valX = parseInt(document.getElementById("input_x").value);
+            if (valX === x_true) {
+                isSuccess = true;
+                ket = `Kode Akhir x = ${x_true} BENAR SPESIFIK!`;
+            } else {
+                ket = `Kode Gagal. Nilai Benar x = ${x_true}.`;
             }
         }
 
@@ -275,7 +285,7 @@
     }
 
     function lanjutBabak() {
-        if (babak < 3) {
+        if (babak < 4) {
             babak++;
             setTimeout(muatBabak, 1200);
         } else {
@@ -283,7 +293,6 @@
         }
     }
 
-    // FUNGSI PENGIRIM DATA KE GOOGLE SHEET
     function kirimDataKeSpreadsheet() {
         fetch(GOOGLE_SCRIPT_URL, {
             method: "POST",
@@ -293,7 +302,7 @@
                 nama: namaAgen,
                 tingkat: tingkatAgen,
                 instansi: instansiAgen,
-                gameMode: "X-Terminator SPLTV",
+                gameMode: "X-Terminator SPLTV (4 Babak)",
                 skor: skor,
                 gelar: gelarAgen
             })
@@ -312,8 +321,8 @@
         document.getElementById("res_skor").innerText = skor;
 
         gelarAgen = "🥉 Trainee Agent";
-        if (skor === 300) gelarAgen = "🏆 Ultimate X-Terminator (CoC Champion)";
-        else if (skor >= 100) gelarAgen = "🥈 Elite Field Agent";
+        if (skor === 400) gelarAgen = "🏆 Ultimate X-Terminator (CoC Champion 4/4!)";
+        else if (skor >= 200) gelarAgen = "🥈 Elite Field Agent";
         document.getElementById("res_gelar").innerText = "Gelar: " + gelarAgen;
 
         let htmlPembahasan = `<b>Kunci Jawaban Sistem:</b> [x = ${x_true}, y = ${y_true}, z = ${z_true}]<br><hr style="border:0.5px solid #4a6278;">`;
@@ -323,7 +332,6 @@
         });
         document.getElementById("pembahasan_list").innerHTML = htmlPembahasan;
 
-        // EKSEKUSI PENGIRIMAN DATA
         kirimDataKeSpreadsheet();
     }
 </script>
