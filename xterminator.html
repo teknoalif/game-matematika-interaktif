@@ -24,7 +24,7 @@
         input[type="number"] { padding: 8px; font-size: 16px; text-align: center; border-radius: 6px; border: none; }
         
         /* Buttons */
-        .btn-action { width: 100%; padding: 12px; background: #e74c3c; color: white; font-weight: bold; font-size: 15px; border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .btn-action { width: 100%; padding: 12px; background: #e74c3c; color: white; font-weight: bold; font-size: 15px; border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; box-sizing: border-box; }
         .btn-action:hover { background: #c0392b; }
         .btn-back { background: #7f8c8d; margin-top: 10px; padding: 8px; font-size: 12px; width: 50%; }
 
@@ -104,7 +104,11 @@
         <div id="pembahasan_list" class="pembahasan-box"></div>
 
         <br>
-        <button class="btn-action" onclick="kembaliKeMenu()">Mulai Misi Baru &larr;</button>
+        <!-- TOMBOL NAVIGASI SETELAH SELESAI -->
+        <div style="display: flex; gap: 8px;">
+            <button class="btn-action" style="flex: 1;" onclick="kembaliKeMenu()">🔄 Misi Baru</button>
+            <a href="index.html" class="btn-action" style="flex: 1; background: #34495e; text-decoration: none; text-align: center; line-height: 20px;">🏠 Portal Utama</a>
+        </div>
     </div>
 </div>
 
@@ -193,7 +197,7 @@
             eqBox.innerHTML = `
                 Persamaan Hasil Eliminasi X:<br>
                 <b>(${newB})y + (${newC})z = ${newD}</b><br>
-                <small>(Petunjuk: Jika y = ${y_true}, berapakah nilai z?)</small>
+                <small style="color:#bdc3c7;">(Petunjuk: Jika y = ${y_true}, berapakah nilai z?)</small>
             `;
             inputCont.innerHTML = `Masukkan Nilai <b>z</b>: <input type="number" id="input_z" style="width:70px;" autofocus>`;
 
