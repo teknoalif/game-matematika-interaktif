@@ -1,0 +1,63 @@
+/* =========================================================
+   LOGIKA BABAK 2 & BABAK 3 GAME X-TERMINATOR (SPLTV CoC)
+   ========================================================= */
+
+// --- FUNGSI MEMUAT TAMPILAN BABAK 2 & 3 ---
+function muatBabakLanjutan() {
+    let eqBox = document.getElementById("equation_display");
+    let inputCont = document.getElementById("input_container");
+
+    if (babak === 2) {
+        document.getElementById("mission_badge").innerText = "BABAK 2: BONGKAR KODE Z";
+        let newB = (b1 * a2) - (b2 * a1);
+        let newC = (c1 * a2) - (c2 * a1);
+        let newD = (d1 * a2) - (d2 * a1);
+        
+        eqBox.innerHTML = `
+            Persamaan Hasil Eliminasi X:<br>
+            <b>(${newB})y + (${newC})z = ${newD}</b><br>
+            <small style="color:#bdc3c7;">(Petunjuk: Jika y = ${y_true}, berapakah nilai z?)</small>
+        `;
+        inputCont.innerHTML = `Masukkan Nilai <b>z</b>: <input type="number" id="input_z" style="width:70px;" autofocus>`;
+
+    } else if (babak === 3) {
+        document.getElementById("mission_badge").innerText = "BABAK 3: FINAL CODE (X & Y)";
+        eqBox.innerHTML = `
+            Sistem Teridentifikasi:<br>
+            Nilai <b>z = ${z_true}</b><br>
+            P1: (${a1})x + (${b1})y + (${c1})(${z_true}) = ${d1}
+        `;
+        inputCont.innerHTML = `
+            Tebak Kode Akhir:<br>
+            Nilai <b>x</b>: <input type="number" id="input_x" style="width:60px; margin-right:8px;" autofocus>
+            Nilai <b>y</b>: <input type="number" id="input_y" style="width:60px;">
+        `;
+    }
+}
+
+// --- FUNGSI VERIFIKASI JAWABAN BABAK 2 & 3 ---
+function cekJawabanBabakLanjutan() {
+    let isSuccess = false;
+    let ket = "";
+
+    if (babak === 2) {
+        let valZ = parseInt(document.getElementById("input_z").value);
+        if (valZ === z_true) {
+            isSuccess = true;
+            ket = `Nilai z = ${z_true} BENAR!`;
+        } else {
+            ket = `Nilai z Salah. Jawaban Benar z = ${z_true}.`;
+        }
+    } else if (babak === 3) {
+        let valX = parseInt(document.getElementById("input_x").value);
+        let valY = parseInt(document.getElementById("input_y").value);
+        if (valX === x_true && valY === y_true) {
+            isSuccess = true;
+            ket = `Kode Akhir x=${x_true} & y=${y_true} BENAR!`;
+        } else {
+            ket = `Kode Gagal. Nilai Benar x=${x_true}, y=${y_true}.`;
+        }
+    }
+
+    return { isSuccess: isSuccess, ket: ket };
+}
