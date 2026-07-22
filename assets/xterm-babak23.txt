@@ -1,4 +1,46 @@
-/* =========================================================
+// Logika 4 Babak X-Terminator
+let babak = 1, x_true, y_true, z_true, a1, b1, c1, d1, a2, b2, c2, d2;
+
+function generateSystemSPLTV() {
+    x_true = randomInt(1, 4);
+    y_true = randomInt(1, 4);
+    z_true = randomInt(1, 4);
+
+    a1 = 1; b1 = randomInt(1, 3); c1 = randomInt(1, 3);
+    d1 = (a1 * x_true) + (b1 * y_true) + (c1 * z_true);
+
+    a2 = randomInt(2, 3); b2 = randomInt(1, 3); c2 = randomInt(1, 3);
+    d2 = (a2 * x_true) + (b2 * y_true) + (c2 * z_true);
+}
+
+function cekJawaban() {
+    if (isGameOver) return;
+    let isSuccess = false;
+
+    if (babak === 1) {
+        let k1 = parseInt(document.getElementById("k1").value);
+        let k2 = parseInt(document.getElementById("k2").value);
+        if ((a1 * k1 === a2 * k2) && k1 > 0 && k2 > 0) isSuccess = true;
+    } else if (babak === 2) {
+        let valZ = parseInt(document.getElementById("input_z").value);
+        if (valZ === z_true) isSuccess = true;
+    } else if (babak === 3) {
+        let valY = parseInt(document.getElementById("input_y").value);
+        if (valY === y_true) isSuccess = true;
+    } else if (babak === 4) {
+        let valX = parseInt(document.getElementById("input_x").value);
+        if (valX === x_true) isSuccess = true;
+    }
+
+    if (isSuccess) {
+        skor += 100;
+        document.getElementById("skor").innerText = skor;
+        document.getElementById("pesan_status").innerText = "MISI BERHASIL! (+100 PTS)";
+    } else {
+        document.getElementById("pesan_status").innerText = "EKSEKUSI GAGAL!";
+    }
+    lanjutBabak(isSuccess);
+}/* =========================================================
    LOGIKA BABAK 2 & BABAK 3 GAME X-TERMINATOR (SPLTV CoC)
    ========================================================= */
 
