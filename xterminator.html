@@ -2,92 +2,274 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>X-Terminator - SPLTV Elimination</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X-TERMINATOR: CoC SPLTV Challenge</title>
     <style>
-        body { font-family: sans-serif; background: #2c3e50; color: white; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .container { background: #34495e; padding: 25px; border-radius: 10px; width: 440px; text-align: center; border: 2px solid #e74c3c; }
-        .stats { display: flex; justify-content: space-between; font-weight: bold; background: #1a252f; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
-        .equation-box { font-size: 16px; margin: 15px 0; text-align: left; background: #2c3e50; padding: 15px; border-radius: 8px; }
-        .input-k { width: 45px; padding: 5px; text-align: center; font-size: 16px; }
-        button { width: 100%; padding: 12px; background: #e74c3c; color: white; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; }
-        #pesan_status { margin-top: 15px; color: #f1c40f; font-weight: bold; min-height: 20px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a252f; color: #ecf0f1; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .game-card { background: #2c3e50; padding: 25px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.4); width: 450px; text-align: center; border: 2px solid #e74c3c; }
+        
+        .coc-title { font-size: 22px; font-weight: bold; color: #e74c3c; text-shadow: 0 2px 4px rgba(0,0,0,0.5); letter-spacing: 1px; margin-bottom: 5px; }
+        .coc-sub { color: #bdc3c7; font-size: 13px; margin-bottom: 20px; }
+        
+        /* Stats & Badge */
+        .stats-bar { display: flex; justify-content: space-between; font-weight: bold; background: #1a252f; padding: 10px; border-radius: 8px; margin-bottom: 15px; color: #f1c40f; }
+        .mission-badge { display: inline-block; background: #e74c3c; color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; }
+        
+        /* Equation Box */
+        .equation-box { font-size: 15px; text-align: left; background: #34495e; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #f1c40f; line-height: 1.8; }
+        .input-k { width: 45px; padding: 4px; text-align: center; font-size: 15px; border-radius: 4px; border: 1px solid #bdc3c7; }
+        input[type="number"], input[type="text"] { padding: 10px; font-size: 16px; text-align: center; border-radius: 6px; border: none; }
+        
+        /* Buttons */
+        .btn-action { width: 100%; padding: 12px; background: #e74c3c; color: white; font-weight: bold; font-size: 15px; border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; }
+        .btn-action:hover { background: #c0392b; }
+        .btn-back { background: #7f8c8d; margin-top: 10px; padding: 8px; font-size: 12px; width: 50%; }
+
+        /* Result & Certificate */
+        .sertifikat-box { background: #1a252f; border: 2px dashed #f1c40f; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        .agent-name { font-size: 20px; font-weight: bold; color: #3498db; }
+        .gelar-badge { font-size: 16px; font-weight: bold; color: #2ecc71; margin-top: 5px; }
+        .pembahasan-box { text-align: left; background: #34495e; border: 1px solid #4a6278; padding: 12px; border-radius: 8px; max-height: 200px; overflow-y: auto; font-size: 13px; line-height: 1.6; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h2>X-TERMINATOR</h2>
-    <div class="stats">
-        <div>LEVEL: <span id="level1">1</span></div>
-        <div>SKOR: <span id="skor1">0</span></div>
-        <div>WAKTU: <span id="waktu1">20</span>s</div>
+<div class="game-card">
+    <!-- 1. HALAMAN MENU & INPUT NAMA AGEN -->
+    <div id="screen_menu">
+        <div class="coc-title">⚔️ X-TERMINATOR: CoC ARENA ⚔️</div>
+        <p class="coc-sub">Misi Intelijen Membongkar Kode Rahasia SPLTV (x, y, z)</p>
+        
+        <input type="text" id="input_nama" placeholder="Ketik Nama Agen Anda..." value="Agen Alif" style="width: 80%; margin-bottom: 20px;"><br>
+        <button class="btn-action" onclick="mulaiMisi()">MULAI MISI PETUALANGAN &rarr;</button>
     </div>
 
-    <div class="equation-box">
-        <p>P1: (<span id="a1"></span>)x + (<span id="b1"></span>)y + (<span id="c1"></span>)z = <span id="d1"></span> | &times; <input type="number" id="k1" class="input-k"></p>
-        <p>P2: (<span id="a2"></span>)x + (<span id="b2"></span>)y + (<span id="c2"></span>)z = <span id="d2"></span> | &times; <input type="number" id="k2" class="input-k"></p>
+    <!-- 2. HALAMAN ARENA MISI GAME -->
+    <div id="screen_game" style="display: none;">
+        <div class="stats-bar">
+            <div>BABAK: <span id="babak_text">1/3</span></div>
+            <div>SKOR: <span id="skor">0</span></div>
+            <div>WAKTU: <span id="waktu">30</span>s</div>
+        </div>
+
+        <div id="mission_badge" class="mission-badge">BABAK 1: ELIMINASI X</div>
+        
+        <div id="equation_display" class="equation-box">
+            <!-- Persamaan disuntikkan via JS -->
+        </div>
+
+        <div id="input_container" style="margin-bottom: 15px;">
+            <!-- Area Input Jawaban Berubah Sesuai Babak -->
+        </div>
+
+        <button class="btn-action" id="btn_submit" onclick="cekJawaban()">EKSEKUSI MISI [ENTER]</button>
+        <br>
+        <button class="btn-action btn-back" onclick="kembaliKeMenu()">&larr; Abort Mission</button>
+
+        <div id="pesan_status" style="margin-top: 12px; font-weight: bold; min-height: 20px; color: #f1c40f;"></div>
     </div>
 
-    <button onclick="cekEliminasi()">ENTER (ELIMINASI X)</button>
-    <div id="pesan_status"></div>
+    <!-- 3. HALAMAN GRAND FINALE / REKAP MISI -->
+    <div id="screen_result" style="display: none;">
+        <div class="coc-title">🏆 BRANKAS RAHASIA TERBONGKAR 🏆</div>
+        
+        <div class="sertifikat-box">
+            <div>Agen Khusus:</div>
+            <div id="res_nama" class="agent-name">Nama Agen</div>
+            <div style="margin-top: 8px;">Skor Akhir: <b id="res_skor" style="color: #f1c40f;">0</b> PTS</div>
+            <div id="res_gelar" class="gelar-badge">Gelar: Ultimate X-Terminator</div>
+        </div>
+
+        <h4 style="text-align: left; margin-bottom: 8px; color: #f1c40f;">📋 Laporan Intelijen (Pembahasan):</h4>
+        <div id="pembahasan_list" class="pembahasan-box"></div>
+
+        <br>
+        <button class="btn-action" onclick="kembaliKeMenu()">Mulai Misi Baru &larr;</button>
+    </div>
 </div>
 
 <script>
-    let skor1 = 0, level1 = 1, waktu1 = 20, timerInterval;
+    let namaAgen = "";
+    let babak = 1; // 1: Eliminasi X, 2: Cari Z, 3: Cari X & Y
+    let skor = 0, waktu = 30, timerInterval;
+    let x_true, y_true, z_true;
     let a1, b1, c1, d1, a2, b2, c2, d2;
+    let isGameOver = false;
+    let riwayatLangkah = [];
 
     function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
-    function buatSoal() {
+    function mulaiMisi() {
+        let inputNama = document.getElementById("input_nama").value.trim();
+        namaAgen = inputNama !== "" ? inputNama : "Agen X";
+        skor = 0; babak = 1; isGameOver = false; riwayatLangkah = [];
+        
+        document.getElementById("skor").innerText = skor;
+        document.getElementById("screen_menu").style.display = "none";
+        document.getElementById("screen_result").style.display = "none";
+        document.getElementById("screen_game").style.display = "block";
+        
+        generateSystemSPLTV();
+        muatBabak();
+    }
+
+    function kembaliKeMenu() {
         clearInterval(timerInterval);
-        waktu1 = 20;
-        document.getElementById("waktu1").innerText = waktu1;
-        document.getElementById("k1").value = ""; document.getElementById("k2").value = "";
-
-        if (level1 === 1) { a1 = 1; a2 = randomInt(2, 4); }
-        else if (level1 === 2) { a1 = 2; a2 = randomInt(3, 5); }
-        else { a1 = randomInt(3, 5); a2 = randomInt(2, 4); }
-
-        b1 = randomInt(1, 3); c1 = randomInt(1, 3); d1 = randomInt(1, 5) * 2;
-        b2 = randomInt(1, 3); c2 = randomInt(1, 3); d2 = randomInt(1, 5) * 3;
-
-        document.getElementById("a1").innerText = a1; document.getElementById("b1").innerText = b1;
-        document.getElementById("c1").innerText = c1; document.getElementById("d1").innerText = d1;
-        document.getElementById("a2").innerText = a2; document.getElementById("b2").innerText = b2;
-        document.getElementById("c2").innerText = c2; document.getElementById("d2").innerText = d2;
-        document.getElementById("level1").innerText = level1;
-
-        timerInterval = setInterval(() => {
-            waktu1--;
-            document.getElementById("waktu1").innerText = waktu1;
-            if (waktu1 <= 0) {
-                clearInterval(timerInterval);
-                document.getElementById("pesan_status").innerText = "TIME OUT!";
-                lanjutLevel();
-            }
-        }, 1000);
+        isGameOver = true;
+        document.getElementById("screen_game").style.display = "none";
+        document.getElementById("screen_result").style.display = "none";
+        document.getElementById("screen_menu").style.display = "block";
     }
 
-    function cekEliminasi() {
-        let k1 = parseInt(document.getElementById("k1").value);
-        let k2 = parseInt(document.getElementById("k2").value);
+    // Generator Kunci Jawaban Bulat Presisi
+    function generateSystemSPLTV() {
+        x_true = randomInt(1, 4);
+        y_true = randomInt(1, 4);
+        z_true = randomInt(1, 4);
 
-        if ((a1 * k1 === a2 * k2) && k1 > 0 && k2 > 0) {
-            skor1 += 100;
-            document.getElementById("skor1").innerText = skor1;
-            document.getElementById("pesan_status").innerText = "TARGET ELIMINATED! (+100 PTS)";
-        } else {
-            document.getElementById("pesan_status").innerText = "ELIMINASI GAGAL! Koefisien x belum sama.";
+        a1 = 1; b1 = randomInt(1, 3); c1 = randomInt(1, 3);
+        d1 = (a1 * x_true) + (b1 * y_true) + (c1 * z_true);
+
+        a2 = randomInt(2, 3); b2 = randomInt(1, 3); c2 = randomInt(1, 3);
+        d2 = (a2 * x_true) + (b2 * y_true) + (c2 * z_true);
+    }
+
+    function muatBabak() {
+        if (isGameOver) return;
+        clearInterval(timerInterval);
+        waktu = 30;
+        document.getElementById("waktu").innerText = waktu;
+        document.getElementById("babak_text").innerText = babak + "/3";
+        document.getElementById("pesan_status").innerText = "";
+
+        let eqBox = document.getElementById("equation_display");
+        let inputCont = document.getElementById("input_container");
+
+        if (babak === 1) {
+            document.getElementById("mission_badge").innerText = "BABAK 1: ELIMINASI VARIABEL X";
+            eqBox.innerHTML = `
+                P1: (${a1})x + (${b1})y + (${c1})z = ${d1} | &times; <input type="number" id="k1" class="input-k" autofocus><br>
+                P2: (${a2})x + (${b2})y + (${c2})z = ${d2} | &times; <input type="number" id="k2" class="input-k">
+            `;
+            inputCont.innerHTML = `<small style="color:#bdc3c7;">Tentukan pengali k1 & k2 agar koefisien x tereliminasi!</small>`;
+
+        } else if (babak === 2) {
+            document.getElementById("mission_badge").innerText = "BABAK 2: BONGKAR KODE Z";
+            let newB = (b1 * a2) - (b2 * a1);
+            let newC = (c1 * a2) - (c2 * a1);
+            let newD = (d1 * a2) - (d2 * a1);
+            
+            eqBox.innerHTML = `
+                Persamaan Hasil Eliminasi X:<br>
+                <b>(${newB})y + (${newC})z = ${newD}</b><br>
+                <small>(Petunjuk: Jika y = ${y_true}, berapakah nilai z?)</small>
+            `;
+            inputCont.innerHTML = `Masukkan Nilai <b>z</b>: <input type="number" id="input_z" style="width:70px;" autofocus>`;
+
+        } else if (babak === 3) {
+            document.getElementById("mission_badge").innerText = "BABAK 3: FINAL CODE (X & Y)";
+            eqBox.innerHTML = `
+                Sistem Teridentifikasi:<br>
+                Nilai <b>z = ${z_true}</b><br>
+                P1: (${a1})x + (${b1})y + (${c1})(${z_true}) = ${d1}
+            `;
+            inputCont.innerHTML = `
+                Tebak Kode Akhir:<br>
+                Nilai <b>x</b>: <input type="number" id="input_x" style="width:60px; margin-right:10px;" autofocus>
+                Nilai <b>y</b>: <input type="number" id="input_y" style="width:60px;">
+            `;
         }
-        lanjutLevel();
+
+        timerInterval = setInterval(jalankanTimer, 1000);
     }
 
-    function lanjutLevel() {
-        if (level1 < 3) { level1++; setTimeout(buatSoal, 1200); }
-        else { clearInterval(timerInterval); document.getElementById("pesan_status").innerText = "MISI SELESAI! Skor Akhir: " + skor1; }
+    function jalankanTimer() {
+        if (isGameOver) return;
+        waktu--;
+        document.getElementById("waktu").innerText = waktu;
+        if (waktu <= 0) {
+            clearInterval(timerInterval);
+            document.getElementById("pesan_status").innerText = "TIME OUT! Misi gagal di babak ini.";
+            lanjutBabak(false, "Waktu Habis");
+        }
     }
 
-    buatSoal();
+    function cekJawaban() {
+        if (isGameOver) return;
+        let isSuccess = false;
+        let ket = "";
+
+        if (babak === 1) {
+            let k1 = parseInt(document.getElementById("k1").value);
+            let k2 = parseInt(document.getElementById("k2").value);
+            if ((a1 * k1 === a2 * k2) && k1 > 0 && k2 > 0) {
+                isSuccess = true;
+                ket = `Pengali k1=${k1}, k2=${k2} Tepat! Koefisien x tereliminasi menjadi ${a1*k1}.`;
+            } else {
+                ket = `Pengali Gagal. ${a1}&times;${k1} &ne; ${a2}&times;${k2}.`;
+            }
+        } else if (babak === 2) {
+            let valZ = parseInt(document.getElementById("input_z").value);
+            if (valZ === z_true) {
+                isSuccess = true;
+                ket = `Nilai z = ${z_true} BENAR!`;
+            } else {
+                ket = `Nilai z Salah. Jawaban Benar z = ${z_true}.`;
+            }
+        } else if (babak === 3) {
+            let valX = parseInt(document.getElementById("input_x").value);
+            let valY = parseInt(document.getElementById("input_y").value);
+            if (valX === x_true && valY === y_true) {
+                isSuccess = true;
+                ket = `Kode Akhir x=${x_true} & y=${y_true} BENAR SPESIFIK!`;
+            } else {
+                ket = `Kode Gagal. Nilai Benar x=${x_true}, y=${y_true}.`;
+            }
+        }
+
+        if (isSuccess) {
+            skor += 100;
+            document.getElementById("skor").innerText = skor;
+            document.getElementById("pesan_status").innerText = "MISI BERHASIL! (+100 PTS)";
+        } else {
+            document.getElementById("pesan_status").innerText = "EKSEKUSI GAGAL!";
+        }
+
+        riwayatLangkah.push({ babak: babak, isSuccess: isSuccess, ket: ket });
+        lanjutBabak(isSuccess);
+    }
+
+    function lanjutBabak() {
+        if (babak < 3) {
+            babak++;
+            setTimeout(muatBabak, 1200);
+        } else {
+            tampilkanFinale();
+        }
+    }
+
+    function tampilkanFinale() {
+        isGameOver = true;
+        clearInterval(timerInterval);
+
+        document.getElementById("screen_game").style.display = "none";
+        document.getElementById("screen_result").style.display = "block";
+
+        document.getElementById("res_nama").innerText = namaAgen;
+        document.getElementById("res_skor").innerText = skor;
+
+        let gelar = "🥉 Trainee Agent";
+        if (skor === 300) gelar = "🏆 Ultimate X-Terminator (CoC Champion)";
+        else if (skor >= 100) gelar = "🥈 Elite Field Agent";
+        document.getElementById("res_gelar").innerText = "Gelar: " + gelar;
+
+        let htmlPembahasan = `<b>Kunci Jawaban Sistem:</b> [x = ${x_true}, y = ${y_true}, z = ${z_true}]<br><hr style="border:0.5px solid #4a6278;">`;
+        riwayatLangkah.forEach((item) => {
+            let status = item.isSuccess ? `<span style="color:#2ecc71;">[SUKSES]</span>` : `<span style="color:#e74c3c;">[GAGAL]</span>`;
+            htmlPembahasan += `<b>Babak ${item.babak}:</b> ${status}<br><small>${item.ket}</small><br>`;
+        });
+        document.getElementById("pembahasan_list").innerHTML = htmlPembahasan;
+    }
 </script>
 </body>
 </html>
