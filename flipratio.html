@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>FLIP RATIO - Perbandingan Berbalik Nilai</title>
+    <style>
+        body { font-family: sans-serif; background: #f39c12; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 25px; border-radius: 12px; width: 360px; text-align: center; }
+        .header { display: flex; justify-content: space-between; font-weight: bold; background: #fef5e7; padding: 10px; border-radius: 6px; margin-bottom: 20px; }
+        .condition-box { font-size: 18px; text-align: left; background: #fdfefe; padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; }
+        input[type="number"] { width: 80px; padding: 5px; font-size: 16px; text-align: center; }
+        button { width: 100%; padding: 12px; background: #d35400; color: white; border: none; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        #pesan_status { margin-top: 15px; font-weight: bold; color: #27ae60; min-height: 24px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>FLIP RATIO</h2>
+    <div class="header">
+        <div>LEVEL: <span id="level2">1</span></div>
+        <div>SKOR: <span id="skor2">0</span></div>
+        <div>WAKTU: <span id="waktu2">15</span>s</div>
+    </div>
+
+    <div class="condition-box">
+        <p>Kondisi Awal: <b><span id="x1"></span></b> pekerja &rarr; <b><span id="y1"></span></b> hari</p>
+        <p>Kondisi Baru: <b><span id="x2"></span></b> pekerja &rarr; <input type="number" id="input_user" placeholder="y2"> hari</p>
+    </div>
+
+    <button onclick="cekJawaban()">ENTER</button>
+    <div id="pesan_status"></div>
+</div>
+
+<script>
+    let skor2 = 0, level2 = 1, waktu2 = 15, timerInterval, x1, y1, x2, y2;
+
+    function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+
+    function buatSoal() {
+        clearInterval(timerInterval);
+        waktu2 = 15;
+        document.getElementById("waktu2").innerText = waktu2;
+        document.getElementById("input_user").value = "";
+
+        let p, q, mult;
+        if (level2 === 1) { p = randomInt(2, 5); q = randomInt(2, 4); mult = randomInt(1, 3); }
+        else if (level2 === 2) { p = randomInt(3, 7); q = randomInt(2, 5); mult = randomInt(2, 5); }
+        else { p = randomInt(4, 9); q = randomInt(3, 7); mult = randomInt(2, 6); }
+
+        // Algoritma Generator Angka Bulat
+        x1 = p * mult; y2 = q; x2 = q * mult; y1 = p;
+
+        document.getElementById("x1").innerText = x1;
+        document.getElementById("y1").innerText = y1;
+        document.getElementById("x2").innerText = x2;
+        document.getElementById("level2").innerText = level2;
+
+        timerInterval = setInterval(() => {
+            waktu2--;
+            document.getElementById("waktu2").innerText = waktu2;
+            if (waktu2 <= 0) {
+                clearInterval(timerInterval);
+                document.getElementById("pesan_status").innerText = "TIME OUT!";
+                lanjutLevel();
+            }
+        }, 1000);
+    }
+
+    function cekJawaban() {
+        let inputUser = document.getElementById("input_user").value;
+        if (inputUser === "") return;
+
+        let y2Benar = (x1 * y1) / x2;
+        if (parseFloat(inputUser) === y2Benar) {
+            skor2 += 100;
+            document.getElementById("skor2").innerText = skor2;
+            document.getElementById("pesan_status").innerText = "BENAR! (+100 PTS)";
+        } else {
+            document.getElementById("pesan_status").innerText = "SALAH! (Jawaban Benar: " + y2Benar + ")";
+        }
+        lanjutLevel();
+    }
+
+    function lanjutLevel() {
+        if (level2 < 3) { level2++; setTimeout(buatSoal, 1200); }
+        else { clearInterval(timerInterval); document.getElementById("pesan_status").innerText = "SELESAI! Total Skor: " + skor2; }
+    }
+
+    buatSoal();
+</script>
+</body>
+</html>
