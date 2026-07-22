@@ -11,6 +11,9 @@
         .title { color: #d35400; font-size: 22px; font-weight: bold; margin-bottom: 5px; }
         .sub-title { color: #7f8c8d; font-size: 13px; margin-bottom: 15px; }
         
+        /* Menu Input Styling */
+        input[type="text"], select { width: 85%; padding: 10px; font-size: 14px; border-radius: 6px; border: 1px solid #ccc; margin-bottom: 10px; text-align: center; box-sizing: border-box; }
+
         /* Stats & Badge */
         .header { display: flex; justify-content: space-between; font-weight: bold; background: #fef5e7; padding: 10px; border-radius: 6px; margin-bottom: 15px; color: #d35400; }
         .mode-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; margin-bottom: 12px; text-transform: uppercase; }
@@ -18,8 +21,8 @@
         .badge-berbalik { background: #e67e22; }
 
         /* Soal Display */
-        .condition-box { font-size: 16px; text-align: left; background: #fdfefe; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #f39c12; }
-        input[type="number"], input[type="text"] { padding: 8px; font-size: 16px; text-align: center; border-radius: 6px; border: 1px solid #ccc; }
+        .condition-box { font-size: 15px; text-align: left; background: #fdfefe; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #f39c12; }
+        input[type="number"] { padding: 8px; font-size: 16px; text-align: center; border-radius: 6px; border: 1px solid #ccc; }
         
         /* Buttons */
         .btn-action { width: 100%; padding: 12px; background: #d35400; color: white; border: none; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
@@ -41,8 +44,24 @@
         <div class="title">🔄 FLIP RATIO: 6 LEVEL CHALLENGE 🔄</div>
         <p class="sub-title">Tantangan Perbandingan Senilai & Berbalik Nilai</p>
         
-        <input type="text" id="input_nama" placeholder="Ketik Nama Anda..." value="Peserta Workshop" style="width: 80%; margin-bottom: 20px;"><br>
-        <button class="btn-action" onclick="mulaiGame()">MULAI TANTANGAN (6 LEVEL) &rarr;</button>
+        <input type="text" id="input_nama" placeholder="Ketik Nama Anda..." value="Peserta Workshop">
+
+        <!-- DROPDOWN TINGKAT & INPUT INSTANSI -->
+        <select id="select_tingkat">
+            <option value="Guru / Pendidik">Guru / Pendidik</option>
+            <option value="Mahasiswa / Dosen">Mahasiswa / Dosen</option>
+            <option value="7 SMP">7 SMP</option>
+            <option value="8 SMP">8 SMP</option>
+            <option value="9 SMP">9 SMP</option>
+            <option value="10 SMA">10 SMA</option>
+            <option value="11 SMA">11 SMA</option>
+            <option value="12 SMA">12 SMA</option>
+            <option value="Umum">Umum</option>
+        </select>
+
+        <input type="text" id="input_instansi" placeholder="Nama Instansi / Sekolah..." value="FMIPA UNM">
+
+        <button class="btn-action" onclick="mulaiGame()" style="margin-top: 10px;">MULAI TANTANGAN (6 LEVEL) &rarr;</button>
     </div>
 
     <!-- 2. HALAMAN ARENA GAME -->
@@ -56,8 +75,8 @@
         <div id="mode_badge" class="mode-badge badge-senilai">MODE: PERBANDINGAN SENILAI</div>
 
         <div class="condition-box">
-            <p id="teks_kondisi1">Kondisi Awal: <b><span id="x1"></span></b> unit &rarr; <b><span id="y1"></span></b> nilai</p>
-            <p id="teks_kondisi2">Kondisi Baru: <b><span id="x2"></span></b> unit &rarr; <input type="number" id="input_user" style="width:80px;" autofocus onkeypress="if(event.key==='Enter') cekJawaban()"> nilai</p>
+            <p id="teks_kondisi1">Kondisi Awal: ...</p>
+            <p id="teks_kondisi2">Kondisi Baru: ...</p>
         </div>
 
         <button class="btn-action" id="btn_submit" onclick="cekJawaban()">ENTER JAWABAN</button>
@@ -74,6 +93,7 @@
         <div class="sertifikat-box">
             <div>Diberikan Kepada:</div>
             <div id="res_nama" class="nama-pemain">Nama Pemain</div>
+            <div id="res_sub" style="font-size: 12px; color: #7f8c8d; margin-top: 2px;">Tingkat | Instansi</div>
             <div style="margin-top: 5px;">Total Skor: <b id="res_skor" style="color:#d35400;">0</b> / 600 PTS</div>
             <div id="res_gelar" class="gelar-badge">Gelar: Ratio Master</div>
         </div>
@@ -87,7 +107,13 @@
 </div>
 
 <script>
+    // URL APPS SCRIPT KAK ALIF
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaxD_dz5Nyou5vVinpfofAcwyt6oGEBsR80Exi2K02UT5_Ng9xUJ1KnavbDWnFKjfE8Q/exec";
+
     let namaPemain = "";
+    let tingkatPemain = "";
+    let instansiPemain = "";
+    let gelarPemain = "";
     let level = 1; // Level 1-3: Senilai, Level 4-6: Berbalik Nilai
     let skor = 0, waktu = 20, timerInterval;
     let x1, y1, x2, y2_benar, jenisMode = "";
@@ -98,7 +124,12 @@
 
     function mulaiGame() {
         let inputNama = document.getElementById("input_nama").value.trim();
+        let inputInstansi = document.getElementById("input_instansi").value.trim();
+
         namaPemain = inputNama !== "" ? inputNama : "Pemain Anonim";
+        tingkatPemain = document.getElementById("select_tingkat").value;
+        instansiPemain = inputInstansi !== "" ? inputInstansi : "Umum";
+
         skor = 0; level = 1; isGameOver = false; riwayatPembahasan = [];
 
         document.getElementById("skor").innerText = skor;
@@ -123,9 +154,7 @@
         waktu = 20;
         document.getElementById("waktu").innerText = waktu;
         document.getElementById("level_text").innerText = level + "/6";
-        document.getElementById("input_user").value = "";
         document.getElementById("pesan_status").innerText = "";
-        document.getElementById("input_user").focus();
 
         let badge = document.getElementById("mode_badge");
 
@@ -225,6 +254,23 @@
         }
     }
 
+    // FUNGSI PENGIRIM DATA KE GOOGLE SPREADSHEET
+    function kirimDataKeSpreadsheet() {
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                nama: namaPemain,
+                tingkat: tingkatPemain,
+                instansi: instansiPemain,
+                gameMode: "Flip Ratio (6 Level)",
+                skor: skor,
+                gelar: gelarPemain
+            })
+        }).catch(err => console.log("Gagal kirim data ke Spreadsheet:", err));
+    }
+
     function tampilkanGameOver() {
         isGameOver = true;
         clearInterval(timerInterval);
@@ -233,12 +279,13 @@
         document.getElementById("screen_result").style.display = "block";
 
         document.getElementById("res_nama").innerText = namaPemain;
+        document.getElementById("res_sub").innerText = `${tingkatPemain} | ${instansiPemain}`;
         document.getElementById("res_skor").innerText = skor;
 
-        let gelar = "🥉 Ratio Novice";
-        if (skor === 600) gelar = "🏆 Ratio Master (Sempurna 6/6!)";
-        else if (skor >= 400) gelar = "🥈 Ratio Expert";
-        document.getElementById("res_gelar").innerText = "Gelar: " + gelar;
+        gelarPemain = "🥉 Ratio Novice";
+        if (skor === 600) gelarPemain = "🏆 Ratio Master (Sempurna 6/6!)";
+        else if (skor >= 400) gelarPemain = "🥈 Ratio Expert";
+        document.getElementById("res_gelar").innerText = "Gelar: " + gelarPemain;
 
         let htmlPembahasan = "";
         riwayatPembahasan.forEach((item) => {
@@ -252,6 +299,9 @@
             `;
         });
         document.getElementById("pembahasan_list").innerHTML = htmlPembahasan;
+
+        // EKSEKUSI PENGIRIMAN DATA KE GOOGLE SHEET
+        kirimDataKeSpreadsheet();
     }
 </script>
 </body>
