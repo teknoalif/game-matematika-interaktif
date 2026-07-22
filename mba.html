@@ -12,6 +12,330 @@
         .menu-title { color: #2c3e50; margin-bottom: 5px; }
         .menu-sub { color: #7f8c8d; font-size: 14px; margin-bottom: 15px; }
         input[type="text"], select { width: 85%; padding: 10px; font-size: 14px; border: 2px solid #ccc; border-radius: 6px; margin-bottom: 10px; text-align: center; box-sizing: border-box; }
+        .btn-menu { display: block; width: 100%; padding: 12px; margin: 8px 0; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; box-sizing: border-box; }
+        .btn-det { background: #27ae60; } .btn-det:hover { background: #219150; }
+        .btn-trace { background: #8e44ad; } .btn-trace:hover { background: #71368a; }
+        .btn-kesamaan { background: #d35400; } .btn-kesamaan:hover { background: #a04000; }
+
+        /* Arena Style */
+        .stats-bar { display: flex; justify-content: space-between; font-weight: bold; background: #f7f9f9; padding: 10px; border-radius: 8px; margin-bottom: 15px; color: #2c3e50; }
+        .mode-badge { display: inline-block; background: #34495e; color: white; padding: 5px 12px; border-radius: 15px; font-size: 13px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; }
+        .soal-text { font-size: 15px; font-weight: bold; color: #34495e; margin-bottom: 10px; min-height: 20px; }
+        .matrix-box { font-size: 22px; font-weight: bold; display: inline-block; padding: 10px 18px; border-left: 4px solid #333; border-right: 4px solid #333; background: #fafafa; margin: 10px 0; }
+        .matrix-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: center; }
+        input[type="number"] { width: 80%; padding: 10px; font-size: 18px; text-align: center; border: 2px solid #ccc; border-radius: 6px; margin-bottom: 12px; }
+        .btn-action { width: 85%; padding: 12px; background: #27ae60; color: white; border: none; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; }
+        .btn-back { background: #7f8c8d; margin-top: 10px; padding: 8px; font-size: 12px; width: 50%; }
+
+        /* Layar Sertifikat & Pembahasan */
+        .sertifikat-box { background: #fef9e7; border: 2px dashed #f39c12; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        .nama-pemain { font-size: 20px; font-weight: bold; color: #d35400; text-decoration: underline; }
+        .gelar-badge { font-size: 16px; font-weight: bold; color: #27ae60; margin-top: 5px; }
+        .pembahasan-box { text-align: left; background: #f8f9f9; border: 1px solid #ddd; padding: 12px; border-radius: 8px; max-height: 200px; overflow-y: auto; font-size: 13px; }
+        .item-pembahasan { margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+        .benar-text { color: #27ae60; font-weight: bold; }
+        .salah-text { color: #c0392b; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="game-card">
+    <!-- 1. HALAMAN MENU & INPUT NAMA -->
+    <div id="screen_menu">
+        <h2 class="menu-title">MATRIX BLITZ ARENA</h2>
+        <p class="menu-sub">Lengkapi Data Identitas & Pilih Mode Game:</p>
+        
+        <input type="text" id="input_nama" placeholder="Ketik Nama Anda..." value="Peserta Workshop">
+
+        <!-- TAMBAHAN ELEMEN DROPDOWN TINGKAT & INPUT INSTANSI -->
+        <select id="select_tingkat">
+            <option value="Guru / Pendidik">Guru / Pendidik</option>
+            <option value="Mahasiswa / Dosen">Mahasiswa / Dosen</option>
+            <option value="7 SMP">7 SMP</option>
+            <option value="8 SMP">8 SMP</option>
+            <option value="9 SMP">9 SMP</option>
+            <option value="10 SMA">10 SMA</option>
+            <option value="11 SMA">11 SMA</option>
+            <option value="12 SMA">12 SMA</option>
+            <option value="Umum">Umum</option>
+        </select>
+
+        <input type="text" id="input_instansi" placeholder="Nama Sekolah / Instansi (misal: FMIPA UNM)..." value="FMIPA UNM">
+
+        <button class="btn-menu btn-det" onclick="pilihMode('DETERMINAN')">1. Determinan Matriks 2×2</button>
+        <button class="btn-menu btn-trace" onclick="pilihMode('TRACE')">2. Trace Matriks (a + d)</button>
+        <button class="btn-menu btn-kesamaan" onclick="pilihMode('KESAMAAN')">3. Kesamaan Matriks (Nilai x)</button>
+    </div>
+
+    <!-- 2. HALAMAN ARENA GAME -->
+    <div id="screen_game" style="display: none;">
+        <h2>MATRIX BLITZ ARENA</h2>
+        <div class="stats-bar">
+            <div>SOAL: <span id="nomor_soal">1</span>/3</div>
+            <div>SKOR: <span id="skor">0</span></div>
+            <div>WAKTU: <span id="waktu">15</span>s</div>
+        </div>
+
+        <div id="mode_badge" class="mode-badge">MODE</div>
+        <div id="soal_text" class="soal-text">Instruksi Soal</div>
+
+        <div class="matrix-box">
+            <div class="matrix-grid">
+                <span id="a">0</span> <span id="b">0</span>
+                <span id="c">0</span> <span id="d">0</span>
+            </div>
+        </div>
+
+        <input type="number" id="input_user" placeholder="Masukkan Jawaban" autofocus onkeypress="if(event.key==='Enter') cekJawaban()">
+        <br>
+        <button class="btn-action" id="btn_enter" onclick="cekJawaban()">ENTER</button>
+        <br>
+        <button class="btn-action btn-back" onclick="kembaliKeMenu()">&larr; Batal</button>
+
+        <div id="pesan_status" style="margin-top: 10px; font-weight: bold; color: #e67e22;"></div>
+    </div>
+
+    <!-- 3. HALAMAN REKAP / GAME OVER -->
+    <div id="screen_result" style="display: none;">
+        <h2>PENGHARGAAN SELESAI!</h2>
+        
+        <div class="sertifikat-box">
+            <div>Diberikan Kepada:</div>
+            <div id="res_nama" class="nama-pemain">Nama Pemain</div>
+            <div id="res_sub" style="font-size: 12px; color: #7f8c8d; margin-top: 2px;">Tingkat | Instansi</div>
+            <div style="margin-top: 5px;">Total Skor: <b id="res_skor">0</b> PTS</div>
+            <div id="res_gelar" class="gelar-badge">Gelar: Matrix Master</div>
+        </div>
+
+        <h4 style="text-align: left; margin-bottom: 8px; color: #2c3e50;">📋 Pembahasan Soal:</h4>
+        <div id="pembahasan_list" class="pembahasan-box"></div>
+
+        <br>
+        <!-- TOMBOL NAVIGASI DENGAN PILIHAN PORTAL UTAMA -->
+        <div style="display: flex; gap: 8px;">
+            <button class="btn-menu btn-det" style="flex: 1;" onclick="kembaliKeMenu()">🔄 Main Lagi</button>
+            <a href="index.html" class="btn-menu" style="flex: 1; background: #34495e; text-decoration: none; text-align: center; line-height: 20px;">🏠 Portal Utama</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // URL GOOGLE APPS SCRIPT KAK ALIF
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaxD_dz5Nyou5vVinpfofAcwyt6oGEBsR80Exi2K02UT5_Ng9xUJ1KnavbDWnFKjfE8Q/exec";
+
+    let namaPemain = "";
+    let tingkatPemain = "";
+    let instansiPemain = "";
+    let modeAktif = "";
+    let gelarPemain = "";
+    let skor = 0, nomorSoal = 1, waktu = 15, timerInterval;
+    let a, b, c, d, jawabanBenar, langkahPembahasan = "";
+    let isGameOver = false; // Flag Pengunci State Game Over
+    let riwayatPembahasan = []; // Array Penyimpan Pembahasan
+
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function pilihMode(mode) {
+        let inputNama = document.getElementById("input_nama").value.trim();
+        let inputInstansi = document.getElementById("input_instansi").value.trim();
+        
+        namaPemain = inputNama !== "" ? inputNama : "Pemain Anonim";
+        tingkatPemain = document.getElementById("select_tingkat").value;
+        instansiPemain = inputInstansi !== "" ? inputInstansi : "Umum";
+
+        modeAktif = mode;
+        skor = 0;
+        nomorSoal = 1;
+        isGameOver = false;
+        riwayatPembahasan = [];
+
+        document.getElementById("skor").innerText = skor;
+        document.getElementById("btn_enter").disabled = false; // Buka kuncian tombol
+        document.getElementById("screen_menu").style.display = "none";
+        document.getElementById("screen_result").style.display = "none";
+        document.getElementById("screen_game").style.display = "block";
+        buatSoal();
+    }
+
+    function kembaliKeMenu() {
+        clearInterval(timerInterval);
+        isGameOver = true;
+        document.getElementById("screen_game").style.display = "none";
+        document.getElementById("screen_result").style.display = "none";
+        document.getElementById("screen_menu").style.display = "block";
+    }
+
+    function buatSoal() {
+        if (isGameOver) return;
+        
+        clearInterval(timerInterval);
+        waktu = 15;
+        document.getElementById("waktu").innerText = waktu;
+        document.getElementById("nomor_soal").innerText = nomorSoal;
+        document.getElementById("input_user").value = "";
+        document.getElementById("pesan_status").innerText = "";
+        document.getElementById("input_user").focus();
+
+        if (modeAktif === "DETERMINAN") {
+            document.getElementById("mode_badge").innerText = "MODE: DETERMINAN 2×2";
+            document.getElementById("soal_text").innerText = "Hitung Nilai det(A) = (a×d) - (b×c):";
+            a = randomInt(1, 6); b = randomInt(1, 6);
+            c = randomInt(1, 6); d = randomInt(1, 6);
+            jawabanBenar = (a * d) - (b * c);
+            langkahPembahasan = `det(A) = (${a} &times; ${d}) - (${b} &times; ${c}) = ${a*d} - ${b*c} = <b>${jawabanBenar}</b>`;
+
+        } else if (modeAktif === "TRACE") {
+            document.getElementById("mode_badge").innerText = "MODE: TRACE MATRIKS";
+            document.getElementById("soal_text").innerText = "Hitung Nilai Trace(A) = a + d:";
+            a = randomInt(-5, 10); b = randomInt(-5, 10);
+            c = randomInt(-5, 10); d = randomInt(-5, 10);
+            jawabanBenar = a + d;
+            langkahPembahasan = `Trace(A) = a + d = ${a} + (${d}) = <b>${jawabanBenar}</b>`;
+
+        } else if (modeAktif === "KESAMAAN") {
+            document.getElementById("mode_badge").innerText = "MODE: KESAMAAN MATRIKS";
+            let xVal = randomInt(-5, 8);
+            let mult = randomInt(2, 4);
+            let constant = randomInt(1, 9);
+            let hasilElemen = (mult * xVal) + constant;
+            
+            document.getElementById("soal_text").innerHTML = `Jika elemen a₁₁ = ${hasilElemen}, cari nilai <b>x</b>:`;
+            a = `${mult}x + ${constant}`; b = randomInt(1, 5);
+            c = randomInt(1, 5); d = randomInt(1, 5);
+            jawabanBenar = xVal;
+            langkahPembahasan = `${mult}x + ${constant} = ${hasilElemen} &rArr; ${mult}x = ${hasilElemen - constant} &rArr; x = <b>${jawabanBenar}</b>`;
+        }
+
+        document.getElementById("a").innerText = a; document.getElementById("b").innerText = b;
+        document.getElementById("c").innerText = c; document.getElementById("d").innerText = d;
+
+        timerInterval = setInterval(jalankanTimer, 1000);
+    }
+
+    function jalankanTimer() {
+        if (isGameOver) return;
+        waktu--;
+        document.getElementById("waktu").innerText = waktu;
+        if (waktu <= 0) {
+            clearInterval(timerInterval);
+            prosesJawaban(null, "Waktu Habis");
+        }
+    }
+
+    function cekJawaban() {
+        if (isGameOver) return; // FIX BUG: Cegah penambahan poin saat Game Over
+        
+        let inputUser = document.getElementById("input_user").value;
+        if (inputUser === "") return;
+
+        prosesJawaban(parseInt(inputUser), "Diisi Player");
+    }
+
+    function prosesJawaban(jawabanUser, ket) {
+        let isBenar = (jawabanUser === jawabanBenar);
+        
+        if (isBenar) {
+            skor += 100;
+            document.getElementById("skor").innerText = skor;
+            document.getElementById("pesan_status").innerText = "BENAR! (+100 PTS)";
+        } else {
+            document.getElementById("pesan_status").innerText = "SALAH / TIME OUT!";
+        }
+
+        // Catat Histori Pembahasan
+        riwayatPembahasan.push({
+            soalKe: nomorSoal,
+            jawabanUser: jawabanUser !== null ? jawabanUser : "Kosong",
+            jawabanBenar: jawabanBenar,
+            isBenar: isBenar,
+            pembahasan: langkahPembahasan
+        });
+
+        lanjutSoal();
+    }
+
+    function lanjutSoal() {
+        if (nomorSoal < 3) {
+            nomorSoal++;
+            setTimeout(buatSoal, 1000);
+        } else {
+            tampilkanGameOver();
+        }
+    }
+
+    // FUNGSI PENGIRIM DATA KE SPREADSHEET KAK ALIF
+    function kirimDataKeSpreadsheet() {
+        fetch(GOOGLE_SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                nama: namaPemain,
+                tingkat: tingkatPemain,
+                instansi: instansiPemain,
+                gameMode: "MBA: " + modeAktif,
+                skor: skor,
+                gelar: gelarPemain
+            })
+        }).catch(err => console.log("Gagal kirim data ke Spreadsheet:", err));
+    }
+
+    function tampilkanGameOver() {
+        isGameOver = true;
+        clearInterval(timerInterval);
+        document.getElementById("btn_enter").disabled = true; // Kunci tombol Enter
+
+        document.getElementById("screen_game").style.display = "none";
+        document.getElementById("screen_result").style.display = "block";
+
+        // Tampilkan Identitas & Gelar
+        document.getElementById("res_nama").innerText = namaPemain;
+        document.getElementById("res_sub").innerText = `${tingkatPemain} | ${instansiPemain}`;
+        document.getElementById("res_skor").innerText = skor;
+
+        gelarPemain = "🥉 Matrix Novice";
+        if (skor === 300) gelarPemain = "🏆 Matrix Master (Sempurna!)";
+        else if (skor >= 100) gelarPemain = "🥈 Matrix Warrior";
+        document.getElementById("res_gelar").innerText = "Gelar: " + gelarPemain;
+
+        // Render Pembahasan
+        let htmlPembahasan = "";
+        riwayatPembahasan.forEach((item) => {
+            let statusBadge = item.isBenar 
+                ? `<span class="benar-text">[BENAR]</span>` 
+                : `<span class="salah-text">[SALAH]</span>`;
+            
+            htmlPembahasan += `
+                <div class="item-pembahasan">
+                    <b>Soal ${item.soalKe}</b> ${statusBadge}<br>
+                    Jawaban Anda: <i>${item.jawabanUser}</i> | Benar: <b>${item.jawabanBenar}</b><br>
+                    <small>Pembahasan: ${item.pembahasan}</small>
+                </div>
+            `;
+        });
+        document.getElementById("pembahasan_list").innerHTML = htmlPembahasan;
+
+        // EKSEKUSI PENGIRIMAN DATA KE GOOGLE SHEET
+        kirimDataKeSpreadsheet();
+    }
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBA - Matrix Blitz Arena</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #e0ece4; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .game-card { background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.15); width: 420px; text-align: center; }
+        
+        /* Menu & Input Nama */
+        .menu-title { color: #2c3e50; margin-bottom: 5px; }
+        .menu-sub { color: #7f8c8d; font-size: 14px; margin-bottom: 15px; }
+        input[type="text"], select { width: 85%; padding: 10px; font-size: 14px; border: 2px solid #ccc; border-radius: 6px; margin-bottom: 10px; text-align: center; box-sizing: border-box; }
         .btn-menu { display: block; width: 100%; padding: 12px; margin: 8px 0; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-det { background: #27ae60; } .btn-det:hover { background: #219150; }
         .btn-trace { background: #8e44ad; } .btn-trace:hover { background: #71368a; }
