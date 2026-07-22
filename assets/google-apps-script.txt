@@ -1,0 +1,33 @@
+/* =========================================================
+   GOOGLE APPS SCRIPT BACKEND (DISIMPAM DI GOOGLE SHEETS)
+   Menu: Extensions -> Apps Script -> Paste Kode Ini -> Deploy
+   ========================================================= */
+
+function doPost(e) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var data = JSON.parse(e.postData.contents);
+  
+  // 1. Mencatat 7 Kolom Data Secara Otomatis dari Game Web
+  sheet.appendRow([
+    new Date(),          // Kolom A: Timestamp / Waktu Pengerjaan
+    data.nama,           // Kolom B: Nama Pemain / Agen
+    data.tingkat,        // Kolom C: Tingkat / Peran (Guru, SMP, SMA, dll)
+    data.instansi,       // Kolom D: Nama Sekolah / Instansi
+    data.gameMode,       // Kolom E: Nama Game / Mode yang Dimainkan
+    data.skor,           // Kolom F: Total Skor Akhir
+    data.gelar          // Kolom G: Gelar Digital yang Diraih
+  ]);
+  
+  // 2. Format Otomatis Baris Terakhir (Middle Vertical Align & Wrap Text)
+  var lastRow = sheet.getLastRow();
+  var range = sheet.getRange(lastRow, 1, 1, 7);
+  range.setWrap(true);
+  range.setVerticalAlignment("middle");
+  
+  // 3. Auto-fit Ukuran Lebar Kolom A s.d G
+  for (var col = 1; col <= 7; col++) {
+    sheet.autoResizeColumn(col);
+  }
+  
+  return ContentService.createTextOutput("Sukses").setMimeType(ContentService.MimeType.TEXT);
+}
