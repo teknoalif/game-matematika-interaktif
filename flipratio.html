@@ -2,92 +2,257 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>FLIP RATIO - Perbandingan Berbalik Nilai</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLIP RATIO - Perbandingan Senilai & Berbalik Nilai</title>
     <style>
-        body { font-family: sans-serif; background: #f39c12; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 25px; border-radius: 12px; width: 360px; text-align: center; }
-        .header { display: flex; justify-content: space-between; font-weight: bold; background: #fef5e7; padding: 10px; border-radius: 6px; margin-bottom: 20px; }
-        .condition-box { font-size: 18px; text-align: left; background: #fdfefe; padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; }
-        input[type="number"] { width: 80px; padding: 5px; font-size: 16px; text-align: center; }
-        button { width: 100%; padding: 12px; background: #d35400; color: white; border: none; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        #pesan_status { margin-top: 15px; font-weight: bold; color: #27ae60; min-height: 24px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f39c12; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .card { background: white; padding: 25px; border-radius: 12px; width: 420px; text-align: center; box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
+        
+        .title { color: #d35400; font-size: 22px; font-weight: bold; margin-bottom: 5px; }
+        .sub-title { color: #7f8c8d; font-size: 13px; margin-bottom: 15px; }
+        
+        /* Stats & Badge */
+        .header { display: flex; justify-content: space-between; font-weight: bold; background: #fef5e7; padding: 10px; border-radius: 6px; margin-bottom: 15px; color: #d35400; }
+        .mode-badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; color: white; margin-bottom: 12px; text-transform: uppercase; }
+        .badge-senilai { background: #27ae60; }
+        .badge-berbalik { background: #e67e22; }
+
+        /* Soal Display */
+        .condition-box { font-size: 16px; text-align: left; background: #fdfefe; padding: 15px; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #f39c12; }
+        input[type="number"], input[type="text"] { padding: 8px; font-size: 16px; text-align: center; border-radius: 6px; border: 1px solid #ccc; }
+        
+        /* Buttons */
+        .btn-action { width: 100%; padding: 12px; background: #d35400; color: white; border: none; font-size: 16px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-action:hover { background: #a04000; }
+        .btn-back { background: #7f8c8d; margin-top: 10px; padding: 8px; font-size: 12px; width: 50%; }
+
+        /* Result & Certificate */
+        .sertifikat-box { background: #fef9e7; border: 2px dashed #f39c12; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+        .nama-pemain { font-size: 20px; font-weight: bold; color: #d35400; }
+        .gelar-badge { font-size: 16px; font-weight: bold; color: #27ae60; margin-top: 5px; }
+        .pembahasan-box { text-align: left; background: #fafafa; border: 1px solid #ddd; padding: 12px; border-radius: 8px; max-height: 200px; overflow-y: auto; font-size: 13px; line-height: 1.5; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>FLIP RATIO</h2>
-    <div class="header">
-        <div>LEVEL: <span id="level2">1</span></div>
-        <div>SKOR: <span id="skor2">0</span></div>
-        <div>WAKTU: <span id="waktu2">15</span>s</div>
+    <!-- 1. HALAMAN MENU & INPUT NAMA -->
+    <div id="screen_menu">
+        <div class="title">🔄 FLIP RATIO: 6 LEVEL CHALLENGE 🔄</div>
+        <p class="sub-title">Tantangan Perbandingan Senilai & Berbalik Nilai</p>
+        
+        <input type="text" id="input_nama" placeholder="Ketik Nama Anda..." value="Peserta Workshop" style="width: 80%; margin-bottom: 20px;"><br>
+        <button class="btn-action" onclick="mulaiGame()">MULAI TANTANGAN (6 LEVEL) &rarr;</button>
     </div>
 
-    <div class="condition-box">
-        <p>Kondisi Awal: <b><span id="x1"></span></b> pekerja &rarr; <b><span id="y1"></span></b> hari</p>
-        <p>Kondisi Baru: <b><span id="x2"></span></b> pekerja &rarr; <input type="number" id="input_user" placeholder="y2"> hari</p>
+    <!-- 2. HALAMAN ARENA GAME -->
+    <div id="screen_game" style="display: none;">
+        <div class="header">
+            <div>LEVEL: <span id="level_text">1/6</span></div>
+            <div>SKOR: <span id="skor">0</span></div>
+            <div>WAKTU: <span id="waktu">20</span>s</div>
+        </div>
+
+        <div id="mode_badge" class="mode-badge badge-senilai">MODE: PERBANDINGAN SENILAI</div>
+
+        <div class="condition-box">
+            <p id="teks_kondisi1">Kondisi Awal: <b><span id="x1"></span></b> unit &rarr; <b><span id="y1"></span></b> nilai</p>
+            <p id="teks_kondisi2">Kondisi Baru: <b><span id="x2"></span></b> unit &rarr; <input type="number" id="input_user" style="width:80px;" autofocus onkeypress="if(event.key==='Enter') cekJawaban()"> nilai</p>
+        </div>
+
+        <button class="btn-action" id="btn_submit" onclick="cekJawaban()">ENTER JAWABAN</button>
+        <br>
+        <button class="btn-action btn-back" onclick="kembaliKeMenu()">&larr; Batal</button>
+
+        <div id="pesan_status" style="margin-top: 12px; font-weight: bold; min-height: 20px; color: #d35400;"></div>
     </div>
 
-    <button onclick="cekJawaban()">ENTER</button>
-    <div id="pesan_status"></div>
+    <!-- 3. HALAMAN REKAP / GAME OVER -->
+    <div id="screen_result" style="display: none;">
+        <div class="title">🏆 PENGHARGAAN SELESAI 🏆</div>
+        
+        <div class="sertifikat-box">
+            <div>Diberikan Kepada:</div>
+            <div id="res_nama" class="nama-pemain">Nama Pemain</div>
+            <div style="margin-top: 5px;">Total Skor: <b id="res_skor" style="color:#d35400;">0</b> / 600 PTS</div>
+            <div id="res_gelar" class="gelar-badge">Gelar: Ratio Master</div>
+        </div>
+
+        <h4 style="text-align: left; margin-bottom: 8px; color: #2c3e50;">📋 Pembahasan Soal (Level 1-6):</h4>
+        <div id="pembahasan_list" class="pembahasan-box"></div>
+
+        <br>
+        <button class="btn-action" onclick="kembaliKeMenu()">Main Lagi &larr;</button>
+    </div>
 </div>
 
 <script>
-    let skor2 = 0, level2 = 1, waktu2 = 15, timerInterval, x1, y1, x2, y2;
+    let namaPemain = "";
+    let level = 1; // Level 1-3: Senilai, Level 4-6: Berbalik Nilai
+    let skor = 0, waktu = 20, timerInterval;
+    let x1, y1, x2, y2_benar, jenisMode = "";
+    let isGameOver = false;
+    let riwayatPembahasan = [];
 
     function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
-    function buatSoal() {
+    function mulaiGame() {
+        let inputNama = document.getElementById("input_nama").value.trim();
+        namaPemain = inputNama !== "" ? inputNama : "Pemain Anonim";
+        skor = 0; level = 1; isGameOver = false; riwayatPembahasan = [];
+
+        document.getElementById("skor").innerText = skor;
+        document.getElementById("screen_menu").style.display = "none";
+        document.getElementById("screen_result").style.display = "none";
+        document.getElementById("screen_game").style.display = "block";
+        
+        buatSoal();
+    }
+
+    function kembaliKeMenu() {
         clearInterval(timerInterval);
-        waktu2 = 15;
-        document.getElementById("waktu2").innerText = waktu2;
+        isGameOver = true;
+        document.getElementById("screen_game").style.display = "none";
+        document.getElementById("screen_result").style.display = "none";
+        document.getElementById("screen_menu").style.display = "block";
+    }
+
+    function buatSoal() {
+        if (isGameOver) return;
+        clearInterval(timerInterval);
+        waktu = 20;
+        document.getElementById("waktu").innerText = waktu;
+        document.getElementById("level_text").innerText = level + "/6";
         document.getElementById("input_user").value = "";
+        document.getElementById("pesan_status").innerText = "";
+        document.getElementById("input_user").focus();
 
-        let p, q, mult;
-        if (level2 === 1) { p = randomInt(2, 5); q = randomInt(2, 4); mult = randomInt(1, 3); }
-        else if (level2 === 2) { p = randomInt(3, 7); q = randomInt(2, 5); mult = randomInt(2, 5); }
-        else { p = randomInt(4, 9); q = randomInt(3, 7); mult = randomInt(2, 6); }
+        let badge = document.getElementById("mode_badge");
 
-        // Algoritma Generator Angka Bulat
-        x1 = p * mult; y2 = q; x2 = q * mult; y1 = p;
+        // LEVEL 1 - 3: PERBANDINGAN SENILAI
+        if (level <= 3) {
+            jenisMode = "SENILAI";
+            badge.innerText = "LEVEL " + level + ": PERBANDINGAN SENILAI";
+            badge.className = "mode-badge badge-senilai";
 
-        document.getElementById("x1").innerText = x1;
-        document.getElementById("y1").innerText = y1;
-        document.getElementById("x2").innerText = x2;
-        document.getElementById("level2").innerText = level2;
+            let mult = randomInt(2, 4);
+            x1 = randomInt(2, 5) * mult;
+            let rasio = randomInt(2, 5);
+            y1 = x1 * rasio;
+            x2 = randomInt(2, 6) * mult;
+            y2_benar = x2 * rasio; // Menjamin hasil selalu bulat presisi
 
-        timerInterval = setInterval(() => {
-            waktu2--;
-            document.getElementById("waktu2").innerText = waktu2;
-            if (waktu2 <= 0) {
-                clearInterval(timerInterval);
-                document.getElementById("pesan_status").innerText = "TIME OUT!";
-                lanjutLevel();
-            }
-        }, 1000);
+            document.getElementById("teks_kondisi1").innerHTML = `Kondisi Awal: <b>${x1}</b> barang &rarr; Rp<b>${y1}</b>`;
+            document.getElementById("teks_kondisi2").innerHTML = `Kondisi Baru: <b>${x2}</b> barang &rarr; Rp<input type="number" id="input_user" style="width:90px;" autofocus onkeypress="if(event.key==='Enter') cekJawaban()">`;
+
+        } 
+        // LEVEL 4 - 6: PERBANDINGAN BERBALIK NILAI
+        else {
+            jenisMode = "BERBALIK NILAI";
+            badge.innerText = "LEVEL " + level + ": PERBANDINGAN BERBALIK NILAI";
+            badge.className = "mode-badge badge-berbalik";
+
+            let p = randomInt(2, 5);
+            let q = randomInt(2, 4);
+            let mult = randomInt(1, 3);
+
+            x1 = p * mult;
+            y2_benar = q;
+            x2 = q * mult;
+            y1 = p; // Menjamin x1 * y1 == x2 * y2
+
+            document.getElementById("teks_kondisi1").innerHTML = `Kondisi Awal: <b>${x1}</b> pekerja &rarr; <b>${y1}</b> hari`;
+            document.getElementById("teks_kondisi2").innerHTML = `Kondisi Baru: <b>${x2}</b> pekerja &rarr; <input type="number" id="input_user" style="width:80px;" autofocus onkeypress="if(event.key==='Enter') cekJawaban()"> hari`;
+        }
+
+        timerInterval = setInterval(jalankanTimer, 1000);
+    }
+
+    function jalankanTimer() {
+        if (isGameOver) return;
+        waktu--;
+        document.getElementById("waktu").innerText = waktu;
+        if (waktu <= 0) {
+            clearInterval(timerInterval);
+            prosesJawaban(null, "Waktu Habis");
+        }
     }
 
     function cekJawaban() {
+        if (isGameOver) return;
         let inputUser = document.getElementById("input_user").value;
         if (inputUser === "") return;
 
-        let y2Benar = (x1 * y1) / x2;
-        if (parseFloat(inputUser) === y2Benar) {
-            skor2 += 100;
-            document.getElementById("skor2").innerText = skor2;
+        prosesJawaban(parseFloat(inputUser), "Diisi Player");
+    }
+
+    function prosesJawaban(jawabanUser) {
+        let isBenar = (jawabanUser === y2_benar);
+        let rumusTeks = "";
+
+        if (jenisMode === "SENILAI") {
+            rumusTeks = `y2 = (${x2} &times; ${y1}) / ${x1} = <b>${y2_benar}</b>`;
+        } else {
+            rumusTeks = `y2 = (${x1} &times; ${y1}) / ${x2} = <b>${y2_benar}</b>`;
+        }
+
+        if (isBenar) {
+            skor += 100;
+            document.getElementById("skor").innerText = skor;
             document.getElementById("pesan_status").innerText = "BENAR! (+100 PTS)";
         } else {
-            document.getElementById("pesan_status").innerText = "SALAH! (Jawaban Benar: " + y2Benar + ")";
+            document.getElementById("pesan_status").innerText = "SALAH / TIME OUT!";
         }
+
+        riwayatPembahasan.push({
+            level: level,
+            jenis: jenisMode,
+            jawabanUser: jawabanUser !== null ? jawabanUser : "Kosong",
+            jawabanBenar: y2_benar,
+            isBenar: isBenar,
+            rumus: rumusTeks
+        });
+
         lanjutLevel();
     }
 
     function lanjutLevel() {
-        if (level2 < 3) { level2++; setTimeout(buatSoal, 1200); }
-        else { clearInterval(timerInterval); document.getElementById("pesan_status").innerText = "SELESAI! Total Skor: " + skor2; }
+        if (level < 6) {
+            level++;
+            setTimeout(buatSoal, 1000);
+        } else {
+            tampilkanGameOver();
+        }
     }
 
-    buatSoal();
+    function tampilkanGameOver() {
+        isGameOver = true;
+        clearInterval(timerInterval);
+
+        document.getElementById("screen_game").style.display = "none";
+        document.getElementById("screen_result").style.display = "block";
+
+        document.getElementById("res_nama").innerText = namaPemain;
+        document.getElementById("res_skor").innerText = skor;
+
+        let gelar = "🥉 Ratio Novice";
+        if (skor === 600) gelar = "🏆 Ratio Master (Sempurna 6/6!)";
+        else if (skor >= 400) gelar = "🥈 Ratio Expert";
+        document.getElementById("res_gelar").innerText = "Gelar: " + gelar;
+
+        let htmlPembahasan = "";
+        riwayatPembahasan.forEach((item) => {
+            let status = item.isBenar ? `<span style="color:#27ae60; font-weight:bold;">[BENAR]</span>` : `<span style="color:#c0392b; font-weight:bold;">[SALAH]</span>`;
+            htmlPembahasan += `
+                <div style="margin-bottom:8px; padding-bottom:6px; border-bottom:1px solid #eee;">
+                    <b>Level ${item.level} (${item.jenis})</b> ${status}<br>
+                    Jawaban Anda: <i>${item.jawabanUser}</i> | Benar: <b>${item.jawabanBenar}</b><br>
+                    <small>Rumus: ${item.rumus}</small>
+                </div>
+            `;
+        });
+        document.getElementById("pembahasan_list").innerHTML = htmlPembahasan;
+    }
 </script>
 </body>
 </html>
